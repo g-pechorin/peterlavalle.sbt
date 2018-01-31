@@ -1,8 +1,13 @@
 package peterlavalle
 
+import java.io.{ByteArrayInputStream, InputStream}
+
 trait TXString {
 
 	implicit class WrappedString(value: String) {
+
+		def toInputStream: InputStream =
+			new ByteArrayInputStream(value.getBytes())
 
 		def stripTrim: String = value.stripMargin.trim + '\n'
 
@@ -27,6 +32,15 @@ trait TXString {
 			value
 				.replaceAll("\n|^", "$0" + ("\t" * indent))
 				.replaceAll("[\t ]+$", "")
+
+		def reReplace(pattern: String, replace: String): String = {
+			val result: String = value.replaceAll(pattern, replace)
+
+			if (result == value)
+				value
+			else
+				result.reReplace(pattern, replace)
+		}
 	}
 
 }

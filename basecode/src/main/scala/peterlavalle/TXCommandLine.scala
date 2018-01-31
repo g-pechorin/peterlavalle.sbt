@@ -8,6 +8,21 @@ trait TXCommandLine {
 
 	implicit class WrappedCommandLine(commandLine: Commandline) {
 
+		def newArgs(values: Any*): Commandline =
+			values.foldLeft(commandLine)(_ newArg _)
+
+		def newArg(value: Any): Commandline = {
+			value match {
+				case f: File =>
+					commandLine.createArg().setFile(f)
+				case s: String =>
+					commandLine.createArg().setValue(s.toString)
+				case i: Int =>
+					commandLine.createArg().setValue(i.toString)
+			}
+			commandLine
+		}
+
 		def invoke(out: String, err: String): Int =
 			invoke(
 				line => println(s"$out$line"),
@@ -26,18 +41,6 @@ trait TXCommandLine {
 
 		def invoke(out: StreamConsumer, err: StreamConsumer): Int =
 			CommandLineUtils.executeCommandLine(commandLine, out, err)
-
-		def newArg(value: Any): Commandline = {
-			value match {
-				case f: File =>
-					commandLine.createArg().setFile(f)
-				case s: String =>
-					commandLine.createArg().setValue(s.toString)
-				case i: Int =>
-					commandLine.createArg().setValue(i.toString)
-			}
-			commandLine
-		}
 
 		@deprecated("use the old shell - don't need/use stdin since it made quick-testing in V$ a pain")
 		def pipe[R](input: InputStream, err: String => Unit = System.err.println)(out: Any => Any): R =

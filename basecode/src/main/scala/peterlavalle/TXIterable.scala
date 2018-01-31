@@ -23,7 +23,32 @@ trait TXIterable {
 	}
 
 	implicit class WrappedIterable[T](value: Iterable[T]) {
+		def clusterBy[K](lambda: T => K): Stream[(K, Iterable[T])] = {
 
+			def recur(tuples: Stream[(K, T)]): Stream[(K, Iterable[T])] =
+				tuples match {
+					case Empty => Empty
+
+					case (key: K, value: T) #:: tail =>
+						def isKey(kv: (K, T)): Boolean = kv._1 == key
+
+						(key,
+							value :: tail.takeWhile(isKey).toList.map((_: (K, T))._2)
+						) #:: recur(tuples.dropWhile(isKey))
+				}
+
+			recur(
+				value.toStream.map {
+					i: T =>
+						(lambda(i), i)
+				}
+			)
+		}
+
+		@deprecated(
+			"unclear to me what this is trying to do that `expand()` doesn't do",
+			"2018-01-13"
+		)
 		def explode(what: T => Iterable[T]): Stream[T] =
 			value match {
 				case Stream() => Empty
@@ -45,11 +70,23 @@ trait TXIterable {
 					value.toStream.explode(what)
 			}
 
+		/**
+			* expands each element in an iterable, and, recurs on the expanded elements
+			*
+			* @param expansion to logic to expand an element
+			* @return a yuge stream of stuff
+			*/
+		def expand(expansion: T => Iterable[T]): Stream[T] =
+			if (value.isEmpty)
+				Stream()
+			else
+				value.head #:: (expansion(value.head).toStream ++ value.tail).expand(expansion)
+
 		def filterTo[E](implicit classTag: ClassTag[E]): List[E] =
 			value
-				.filter(i => classTag.runtimeClass.isInstance(i))
+				.filter((i: T) => classTag.runtimeClass.isInstance(i))
 				.toList
-				.map(_.asInstanceOf[E])
+				.map((_: T).asInstanceOf[E])
 
 		def foldIn(fold: (T, T) => T): T =
 			value.tail.foldLeft(value.head)(fold)

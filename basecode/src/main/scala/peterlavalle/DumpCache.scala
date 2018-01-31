@@ -8,14 +8,17 @@ import java.util.zip.{ZipEntry, ZipFile}
 
 import scala.sys.process._
 
-class DumpCache(root: File) {
-	def apply(url: String): File = {
-		val path = url.replaceAll("[_[^\\w]]+", "_")
-		val dir = root / path
+case class DumpCache(root: File) {
+	def apply(url: String): File =
+		apply(url, url.replaceAll("[_[^\\w]]+", "_"))
+
+	def apply(url: String, path: String): File = {
+
+		val dir: File = root / path
 
 		if (!dir.exists()) {
 
-			val zip = File.createTempFile(path, ".zip")
+			val zip: File = File.createTempFile(path, ".zip")
 
 			DumpCache.download(
 				url,
@@ -37,11 +40,11 @@ class DumpCache(root: File) {
 
 object DumpCache {
 	def download(url: String, zip: File): Unit = {
-		new URL(url) #> zip.makeParentFolder !!
+		new URL(url) #> zip.getParentFile.EnsureExists !!
 	}
 
 	def extract(zip: File, dir: File): Unit = {
-		val zipFile = new ZipFile(zip)
+		val zipFile: ZipFile = new ZipFile(zip)
 
 		def recu(entries: util.Enumeration[_]): Unit =
 			if (!entries.hasMoreElements) {
@@ -52,7 +55,7 @@ object DumpCache {
 						if (!next.isDirectory)
 							Files.copy(
 								zipFile.getInputStream(next),
-								(dir / next.getName).makeParentFolder.toPath
+								(dir / next.getName).getParentFile.EnsureExists.toPath
 							)
 						recu(entries)
 				}

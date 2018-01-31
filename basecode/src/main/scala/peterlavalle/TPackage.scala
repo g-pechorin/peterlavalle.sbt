@@ -1,11 +1,6 @@
 package peterlavalle
 
-import java.io._
-
-import org.codehaus.plexus.util.cli.{CommandLineUtils, Commandline, StreamConsumer}
-
 import scala.collection.convert.{WrapAsJava, WrapAsScala}
-import scala.collection.immutable.Stream.Empty
 import scala.reflect.ClassTag
 
 trait TPackage
@@ -19,6 +14,7 @@ trait TPackage
 		with TXOutputStream
 		with TXWriter
 		with TXString
+		with TXThrowable
 		with WrapAsScala with WrapAsJava {
 
 	implicit class WrapClassTag[T](thisTag: ClassTag[T]) {
@@ -35,7 +31,7 @@ trait TPackage
 		val base = new NotImplementedError
 		base.setStackTrace(base.getStackTrace.tail)
 
-		while (base.getStackTrace.head.toString.trim.matches(".*\\$qmark\\$qmark\\$qmark\\([^\\)]+\\)$"))
+		while (base.getStackTrace.head.toString.trim.matches(".*\\$qmark\\$qmark\\$qmark\\$?\\([^\\)]+\\)$"))
 			base.setStackTrace(base.getStackTrace.tail)
 
 		val notImplementedError = new NotImplementedError(s"${base.getMessage} @ ${base.getStackTrace.head.toString.trim}")
