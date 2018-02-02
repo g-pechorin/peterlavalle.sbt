@@ -1,7 +1,7 @@
 package peterlavalle.swung
 
-import java.awt.{Container, Frame}
 import java.awt.event._
+import java.awt.{Container, Frame}
 import javax.swing.{JDialog, JTextArea, _}
 
 trait TPackage extends TMenus {

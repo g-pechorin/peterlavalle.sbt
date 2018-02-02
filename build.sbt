@@ -40,7 +40,8 @@ lazy val junit =
 			name := "junit",
 			commonSettings,
 			libraryDependencies ++= Seq(
-				"junit" % "junit" % "4.12"
+				"junit" % "junit" % "4.12",
+				"org.easymock" % "easymock" % "3.5.1"
 			)
 		)
 		.dependsOn(

@@ -1,20 +1,21 @@
 package peterlavalle
 
-import scala.collection.convert.{WrapAsJava, WrapAsScala}
+import scala.collection.convert.{DecorateAsJava, DecorateAsScala, WrapAsJava, WrapAsScala}
 import scala.reflect.ClassTag
 
 trait TPackage
 	extends TContextDependantMapping
 		with TXCommandLine
+		with TXDate
 		with TXFile
 		with TXInputStream
 		with TXIterable
 		with TXMap
 		with TXObject
 		with TXOutputStream
-		with TXWriter
 		with TXString
 		with TXThrowable
+		with TXWriter
 		with WrapAsScala with WrapAsJava {
 
 	implicit class WrapClassTag[T](thisTag: ClassTag[T]) {

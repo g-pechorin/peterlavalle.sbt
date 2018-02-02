@@ -1,12 +1,38 @@
 package peterlavalle
 
 import java.io.{File, InputStream}
+import java.util
 
 import org.codehaus.plexus.util.cli.{CommandLineUtils, Commandline, StreamConsumer}
 
 trait TXCommandLine {
 
 	implicit class WrappedCommandLine(commandLine: Commandline) {
+		def text[O](code: (Int, Iterable[String], Iterable[String]) => O): Unit = {
+			object Out extends StreamConsumer {
+				val list = new util.LinkedList[String]
+
+				override def consumeLine(line: String): Unit =
+					list.add(line)
+			}
+			object Err extends StreamConsumer {
+
+				val list = new util.LinkedList[String]
+
+				override def consumeLine(line: String): Unit =
+					list.add(line)
+			}
+
+			val r =
+				commandLine.invoke(Out, Err)
+			code(r,
+				Out.list.toArray.map(_.asInstanceOf[String]),
+				Err.list.toArray.map(_.asInstanceOf[String])
+			)
+		}
+
+		def invoke(out: StreamConsumer, err: StreamConsumer): Int =
+			CommandLineUtils.executeCommandLine(commandLine, out, err)
 
 		def newArgs(values: Any*): Commandline =
 			values.foldLeft(commandLine)(_ newArg _)
@@ -38,9 +64,6 @@ trait TXCommandLine {
 					override def consumeLine(line: String): Unit = err(line)
 				}
 			)
-
-		def invoke(out: StreamConsumer, err: StreamConsumer): Int =
-			CommandLineUtils.executeCommandLine(commandLine, out, err)
 
 		@deprecated("use the old shell - don't need/use stdin since it made quick-testing in V$ a pain")
 		def pipe[R](input: InputStream, err: String => Unit = System.err.println)(out: Any => Any): R =

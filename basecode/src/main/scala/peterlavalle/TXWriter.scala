@@ -13,9 +13,6 @@ trait TXWriter {
 					value.appund(tostr(thing))
 			}
 
-		def appund[E](text: String): W =
-			value.append(text).asInstanceOf[W]
-
 		def appendSection[I](prefix: => String, contents: Iterable[I], suffix: String = "")(tostr: I => String): W =
 			if (contents.isEmpty)
 				value
@@ -25,6 +22,9 @@ trait TXWriter {
 					.appund(contents)(tostr)
 					.appund(suffix)
 			}
+
+		def appund[E](text: String): W =
+			value.append(text).asInstanceOf[W]
 
 		def appund[E](many: Iterable[E])(tostr: E => String): W =
 			appund(many.iterator)(tostr)

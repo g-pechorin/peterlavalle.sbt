@@ -19,6 +19,8 @@ trait TMenus {
 					menuBar
 			}
 
+		def menus: List[JMenu] = (0 until menuBar.getMenuCount).toList.map(menuBar.getMenu)
+
 		def item(path: List[String]): JMenuItem = {
 			val head :: tail = path
 
@@ -37,8 +39,6 @@ trait TMenus {
 
 			menu.follow(tail)
 		}
-
-		def menus: List[JMenu] = (0 until menuBar.getMenuCount).toList.map(menuBar.getMenu)
 	}
 
 	implicit class WrappedJMenu[J <: JMenu](menu: J) {

@@ -1,9 +1,21 @@
 package peterlavalle
 
 import junit.framework.TestCase
+import org.easymock.{EasyMock, IExpectationSetters}
 import org.junit.Assert.{assertEquals, fail}
 
+import scala.reflect.ClassTag
+
 class ATestCase extends TestCase {
+
+	def newMock[T](implicit classTag: ClassTag[T]): T = {
+		EasyMock.createMock[T](classTag.runtimeClass.asInstanceOf[Class[T]])
+	}
+
+	implicit class MockWrap[T <: AnyRef](value: T) {
+		def mockExpect[V](call: T => V, result: V): IExpectationSetters[V] =
+			EasyMock.expect[V](call(value)).andReturn(result)
+	}
 
 	def sAssertEqual[T](expected: => T, actual: T): T =
 		sAssertEqual(null, expected, actual)

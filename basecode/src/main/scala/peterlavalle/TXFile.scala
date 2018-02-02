@@ -2,7 +2,6 @@ package peterlavalle
 
 import java.awt.Desktop
 import java.io._
-import java.nio.channels.Channels
 
 import org.codehaus.plexus.util.cli.Commandline
 
@@ -151,6 +150,13 @@ object TXFile {
 	}
 
 	sealed trait TWrappedFileShell extends TWrappedFileBase {
+
+
+		def Shell(cmd: String, arg0: Any, args: Any*): Commandline =
+			(arg0 :: args.toList).foldLeft(file.getAbsoluteFile.Shell(cmd))(_ newArg _)
+
+		def ??(query: String => Boolean): Stream[String] =
+			file.**.filter(query)
 
 		def Chain(out: String => Unit, err: String => Unit)(commands: Iterable[Any]*): Boolean =
 			Chain(

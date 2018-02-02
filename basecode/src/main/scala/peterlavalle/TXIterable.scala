@@ -23,6 +23,7 @@ trait TXIterable {
 	}
 
 	implicit class WrappedIterable[T](value: Iterable[T]) {
+
 		def clusterBy[K](lambda: T => K): Stream[(K, Iterable[T])] = {
 
 			def recur(tuples: Stream[(K, T)]): Stream[(K, Iterable[T])] =
