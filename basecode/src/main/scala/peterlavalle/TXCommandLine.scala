@@ -8,7 +8,7 @@ import org.codehaus.plexus.util.cli.{CommandLineUtils, Commandline, StreamConsum
 trait TXCommandLine {
 
 	implicit class WrappedCommandLine(commandLine: Commandline) {
-		def text[O](code: (Int, Iterable[String], Iterable[String]) => O): Unit = {
+		def text[O](code: (Int, Iterable[String], Iterable[String]) => O): O = {
 			object Out extends StreamConsumer {
 				val list = new util.LinkedList[String]
 
