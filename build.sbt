@@ -33,6 +33,13 @@ lazy val basecode =
 				"junit" % "junit" % "4.12" % Test
 			)
 		)
+lazy val merc =
+	project
+		.settings(
+			name := "merc",
+			commonSettings
+		)
+		.dependsOn(basecode)
 
 lazy val junit =
 	project
@@ -84,7 +91,8 @@ lazy val root =
 			antlr,
 			basecode,
 			junit,
-			swung
+			swung,
+			merc
 		)
 		.settings(
 			name := "peterlavalle-root",
