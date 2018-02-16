@@ -2,7 +2,7 @@ package peterlavalle
 
 import java.util
 
-class LazyCache[K, V](spawn: K => V) {
+class LazyCache[K, V](spawn: K => V) extends (K => V) {
 
 	private val cache: util.HashMap[K, V] = new java.util.HashMap[K, V]()
 
@@ -11,6 +11,11 @@ class LazyCache[K, V](spawn: K => V) {
 			if (!cache.containsKey(key))
 				cache.put(key, spawn(key))
 			cache.get(key)
+		}
+
+	def ?(key: K): Boolean =
+		cache.synchronized {
+			cache.containsKey(key)
 		}
 }
 

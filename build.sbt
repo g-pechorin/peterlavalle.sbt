@@ -14,11 +14,14 @@ lazy val commonSettings =
 				dateFormat.format(new Date())
 			} else {
 				import sys.process._
-				"hg log -r. --template {branch}".!!.trim
+				"hg log -r. --template {branch}-SNAPSHOT".!!.trim
 			}
 		},
 		scalaVersion := "2.12.3",
-		publishTo := Some(Resolver.file("file", new File("target/m2-repo")))
+		publishTo := Some(Resolver.file("file", new File("target/m2-repo"))),
+		libraryDependencies ++= Seq(
+			"junit" % "junit" % "4.12" % Test
+		)
 	)
 
 
@@ -29,8 +32,7 @@ lazy val basecode =
 			commonSettings,
 
 			libraryDependencies ++= Seq(
-				"org.codehaus.plexus" % "plexus-utils" % "3.1.0",
-				"junit" % "junit" % "4.12" % Test
+				"org.codehaus.plexus" % "plexus-utils" % "3.1.0"
 			)
 		)
 lazy val merc =
@@ -75,15 +77,18 @@ lazy val swung =
 	project
 		.settings(
 			name := "peterlavalle-swung",
-			commonSettings,
-			libraryDependencies ++= Seq(
-				"junit" % "junit" % "4.12" % Test
-			)
+			commonSettings
 		)
 		.dependsOn(
 			basecode
 		)
 
+lazy val sstate =
+	(project in file("sstate"))
+		.settings(
+			name := "sstate",
+			commonSettings
+		)
 
 lazy val root =
 	(project in file("."))
@@ -91,8 +96,9 @@ lazy val root =
 			antlr,
 			basecode,
 			junit,
-			swung,
-			merc
+			merc,
+			sstate,
+			swung
 		)
 		.settings(
 			name := "peterlavalle-root",
