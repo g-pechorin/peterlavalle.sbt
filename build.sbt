@@ -11,7 +11,7 @@ lazy val commonSettings =
 				import java.util.{Date, Locale, TimeZone}
 				val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.UK)
 				dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
-				dateFormat.format(new Date())
+				"v" + dateFormat.format(new Date())
 			} else {
 				import sys.process._
 				"hg log -r. --template {branch}-SNAPSHOT".!!.trim
