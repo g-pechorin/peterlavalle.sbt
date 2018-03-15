@@ -4,19 +4,6 @@ import java.io.File
 
 object Mercurial {
 
-	trait TRevision {
-		val node: String
-		val repository: TRepository
-
-		def branch: String
-	}
-
-	trait TRepository {
-		def heads: Iterable[TRevision]
-
-		def active: Mercurial.TRevision
-	}
-
 	def open(root: File): Mercurial.TRepository =
 		new Mercurial.TRepository {
 			val self: TRepository = this
@@ -63,5 +50,18 @@ object Mercurial {
 						}
 				}
 		}
+
+	trait TRevision {
+		val node: String
+		val repository: TRepository
+
+		def branch: String
+	}
+
+	trait TRepository {
+		def heads: Iterable[TRevision]
+
+		def active: Mercurial.TRevision
+	}
 
 }

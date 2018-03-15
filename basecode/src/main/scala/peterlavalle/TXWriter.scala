@@ -23,14 +23,14 @@ trait TXWriter {
 					.appund(suffix)
 			}
 
-		def appund[E](text: String): W =
-			value.append(text).asInstanceOf[W]
-
 		def appund[E](many: Iterable[E])(tostr: E => String): W =
 			appund(many.iterator)(tostr)
 
 		def appund[E](many: Iterator[E])(tostr: E => String): W =
 			many.foldLeft(value)((w: W, e: E) => w.appund(tostr(e)))
+
+		def appund[E](text: String): W =
+			value.append(text).asInstanceOf[W]
 	}
 
 }

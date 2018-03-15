@@ -7,6 +7,10 @@ import org.codehaus.plexus.util.cli.{CommandLineUtils, Commandline, StreamConsum
 
 trait TXCommandLine {
 
+	implicit class LambdaStreamConsumer(lambda: String => Any) extends StreamConsumer {
+		override def consumeLine(line: String): Unit = lambda
+	}
+
 	implicit class WrappedCommandLine(commandLine: Commandline) {
 		def text[O](code: (Int, Iterable[String], Iterable[String]) => O): O = {
 			object Out extends StreamConsumer {
@@ -45,6 +49,8 @@ trait TXCommandLine {
 					commandLine.createArg().setValue(s.toString)
 				case i: Int =>
 					commandLine.createArg().setValue(i.toString)
+				case later: Later[_] =>
+					newArg(later.get)
 			}
 			commandLine
 		}

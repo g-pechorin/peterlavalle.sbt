@@ -1,6 +1,6 @@
 package peterlavalle
 
-import scala.collection.convert.{DecorateAsJava, DecorateAsScala, WrapAsJava, WrapAsScala}
+import scala.collection.convert.{WrapAsJava, WrapAsScala}
 import scala.reflect.ClassTag
 
 trait TPackage

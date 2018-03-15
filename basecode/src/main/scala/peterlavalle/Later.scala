@@ -37,7 +37,7 @@ trait Later[T] {
 			case Some(value) =>
 				handle(value)
 			case None =>
-				throw new Later.NotReadyException
+				throw new Later.NotReadyException(this)
 		}
 }
 
@@ -51,8 +51,16 @@ object Later {
 		}
 	}
 
-	class NotReadyException(message: String) extends Exception(message) {
-		def this() = this("a later is not ready")
+	trait T {
+
+		import scala.language.implicitConversions
+		import scala.languageFeature.implicitConversions
+
+		implicit def nowLater[T](later: Later[T]): T = later.get
+	}
+
+	class NotReadyException(message: String, val later: AnyRef) extends Exception(message) {
+		def this(which: AnyRef) = this("a later is not ready", which)
 	}
 
 	class PassThrough[O, I](real: Later[I], wrapper: I => O)(implicit oTag: ClassTag[O], iTag: ClassTag[I]) extends Later[O] {
@@ -63,7 +71,17 @@ object Later {
 			}
 	}
 
-	class SetOnce[T] {
+	class SetOnce[T](message: => String = null) {
+		lazy val later: Later[T] =
+			new Later[T] {
+				override def ??[V](handle: (Option[T]) => V): V =
+					try {
+						handle(value)
+					} catch {
+						case e: Later.NotReadyException if null != message && this == e.later =>
+							throw new NotReadyException(message)
+					}
+			}
 		private var value: Option[T] = None
 
 		def :=(value: T): Unit =
@@ -71,27 +89,8 @@ object Later {
 				case None =>
 					this.value = Some(value)
 			}
-
-		def later: Later[T] =
-			new Later[T] {
-				override def ??[V](handle: (Option[T]) => V): V =
-					handle(value)
-			}
-
-
-		def withError(message: => String): SetOnce[T] =
-			new SetOnce[T] {
-				override def later: Later[T] =
-					new Later[T] {
-						override def ??[V](handle: (Option[T]) => V): V =
-							try {
-								handle(value)
-							} catch {
-								case _: Later.NotReadyException =>
-									throw new NotReadyException(message)
-							}
-					}
-			}
 	}
+
+	object cast extends T
 
 }

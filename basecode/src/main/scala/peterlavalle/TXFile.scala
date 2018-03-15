@@ -96,6 +96,8 @@ object TXFile {
 
 		def ** : Stream[String] = this ** ((_: String) => true)
 
+		def **(pattern: String): Stream[String] = this ** ((_: String) matches pattern)
+
 		def **(query: String => Boolean): Stream[String] = {
 			def recu(todo: List[String]): Stream[String] =
 				todo match {
@@ -138,8 +140,6 @@ object TXFile {
 				path.split("/").toList
 			)
 		}
-
-		def **(pattern: String): Stream[String] = this ** ((_: String) matches pattern)
 
 	}
 

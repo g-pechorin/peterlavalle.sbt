@@ -24,39 +24,6 @@ lazy val commonSettings =
 		)
 	)
 
-
-lazy val basecode =
-	project
-		.settings(
-			name := "peterlavalle",
-			commonSettings,
-
-			libraryDependencies ++= Seq(
-				"org.codehaus.plexus" % "plexus-utils" % "3.1.0"
-			)
-		)
-lazy val merc =
-	project
-		.settings(
-			name := "merc",
-			commonSettings
-		)
-		.dependsOn(basecode)
-
-lazy val junit =
-	project
-		.settings(
-			name := "junit",
-			commonSettings,
-			libraryDependencies ++= Seq(
-				"junit" % "junit" % "4.12",
-				"org.easymock" % "easymock" % "3.5.1"
-			)
-		)
-		.dependsOn(
-			basecode
-		)
-
 lazy val antlr =
 	project
 		.settings(
@@ -72,6 +39,48 @@ lazy val antlr =
 		.dependsOn(
 			basecode
 		)
+
+lazy val basecode =
+	project
+		.settings(
+			name := "peterlavalle",
+			commonSettings,
+
+			libraryDependencies ++= Seq(
+				"org.codehaus.plexus" % "plexus-utils" % "3.1.0"
+			)
+		)
+
+lazy val junit =
+	project
+		.settings(
+			name := "junit",
+			commonSettings,
+			libraryDependencies ++= Seq(
+				"junit" % "junit" % "4.12",
+				"org.easymock" % "easymock" % "3.5.1"
+			)
+		)
+		.dependsOn(
+			basecode
+		)
+
+lazy val merc =
+	project
+		.settings(
+			name := "merc",
+			commonSettings
+		)
+		.dependsOn(basecode)
+		
+lazy val phile =
+	project
+		.settings(
+			name := "phile",
+			commonSettings
+		)
+		.dependsOn(basecode)
+		.dependsOn(junit % Test)
 
 lazy val swung =
 	project
@@ -97,6 +106,7 @@ lazy val root =
 			basecode,
 			junit,
 			merc,
+			phile,
 			sstate,
 			swung
 		)
