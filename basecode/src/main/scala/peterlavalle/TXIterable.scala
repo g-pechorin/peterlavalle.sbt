@@ -83,9 +83,9 @@ trait TXIterable {
 			else
 				value.head #:: (expansion(value.head).toStream ++ value.tail).expand(expansion)
 
-		def filterTo[E](implicit classTag: ClassTag[E]): List[E] =
+		def filterTo[E](implicit classTag: ClassTag[E]): Iterable[E] =
 			value
-				.filter((i: T) => classTag.runtimeClass.isInstance(i))
+				.filter(classTag.runtimeClass.isInstance)
 				.toList
 				.map((_: T).asInstanceOf[E])
 

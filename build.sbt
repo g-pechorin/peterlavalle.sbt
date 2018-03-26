@@ -17,6 +17,7 @@ lazy val commonSettings =
 				"hg log -r. --template {branch}-SNAPSHOT".!!.trim
 			}
 		},
+		javacOptions ++= Seq("-encoding", "UTF-8"),
 		scalaVersion := "2.12.3",
 		publishTo := Some(Resolver.file("file", new File("target/m2-repo"))),
 		libraryDependencies ++= Seq(
@@ -51,6 +52,13 @@ lazy val basecode =
 			)
 		)
 
+lazy val frege =
+	project
+		.settings(
+			name := "peterlavalle",
+			commonSettings
+		)
+
 lazy val junit =
 	project
 		.settings(
@@ -72,7 +80,16 @@ lazy val merc =
 			commonSettings
 		)
 		.dependsOn(basecode)
-		
+
+lazy val pcof =
+	project
+		.settings(
+			name := "pcof",
+			commonSettings
+		)
+		.dependsOn(basecode)
+		.dependsOn(junit % Test)
+
 lazy val phile =
 	project
 		.settings(
@@ -104,8 +121,10 @@ lazy val root =
 		.aggregate(
 			antlr,
 			basecode,
+			frege,
 			junit,
 			merc,
+			pcof,
 			phile,
 			sstate,
 			swung
