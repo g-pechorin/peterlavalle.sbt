@@ -22,6 +22,16 @@ trait TXString {
 			runtimeException.setStackTrace(base.getStackTrace)
 			throw runtimeException
 		}
+		def toHash(form: String = "SHA-256"): String = {
+			import java.nio.charset.StandardCharsets
+			import java.security.MessageDigest
+			new StringBuilder()
+				.rollLeft(MessageDigest.getInstance(form).digest(value.getBytes(StandardCharsets.UTF_8))) {
+					case (s, b: Byte) =>
+						s.append(String.format("%02X", new java.lang.Byte(b)))
+				}
+				.toString()
+		}
 
 		def stripMarginTail: String =
 			value

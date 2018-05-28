@@ -120,6 +120,21 @@ object TXFile {
 			}).filter(query)
 		}
 
+		def !!(pattern: String): Stream[String] = {
+			def recu(todo: List[String]): Stream[String] =
+				todo.filterNot(_ matches pattern).toStream.flatMap {
+					path: String =>
+						(file / path).list() match {
+							case null => Stream(path)
+							case list => recu(list.toList.map(path + '/' + _))
+						}
+				}
+
+			recu(
+				file.list().toList
+			)
+		}
+
 		def /(path: String): File = {
 
 			def recu(file: File, todo: List[String]): File =
