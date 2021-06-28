@@ -1,4 +1,0 @@
-package peterlavalle.frege.HelloWorld where
-
-main :: [String] -> IO ()
-main _ = print "Hello, world!"

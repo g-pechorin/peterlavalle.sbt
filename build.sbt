@@ -1,146 +1,45 @@
 
+/// ====
+// monorepo config block
 
-lazy val commonSettings =
+import sbt.Def
+import java.io.File
+
+val hgRoot: File = {
+	var root = file("").getAbsoluteFile.getParentFile
+
+	while (!(root / "sbt.bin/scala.conf").exists())
+		root = root.getAbsoluteFile.getParentFile.getAbsoluteFile
+
+	root
+}
+
+def conf: String => String = {
+	import com.typesafe.config.ConfigFactory
+
+	(key: String) =>
+		ConfigFactory.parseFile(
+			hgRoot / "sbt.bin/scala.conf"
+		).getString(key)
+}
+// end of monorepo config block
+
+organization := "com.peterlavalle"
+scalaVersion := conf("scala.version")
+scalacOptions ++= conf("scala.options").split("/").toSeq
+
+resolvers += Classpaths.typesafeReleases
+resolvers += Resolver.mavenCentral
+resolvers += Resolver.jcenterRepo
+resolvers += "jitpack" at "https://jitpack.io"
+
+// end of standard stuff
+/// ---
+
+name := "minibase"
+
+libraryDependencies ++=
 	Seq(
-		organization := "com.peterlavalle",
-		version := {
-			//
-			// generate a version string
-			if (System.getProperty("release", "false").toBoolean) {
-				import java.text.SimpleDateFormat
-				import java.util.{Date, Locale, TimeZone}
-				val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.UK)
-				dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
-				"v" + dateFormat.format(new Date())
-			} else {
-				import sys.process._
-				"hg log -r. --template {branch}-SNAPSHOT".!!.trim
-			}
-		},
-		javacOptions ++= Seq("-encoding", "UTF-8"),
-		scalaVersion := "2.12.3",
-		publishTo := Some(Resolver.file("file", new File("target/m2-repo"))),
-		libraryDependencies ++= Seq(
-			"junit" % "junit" % "4.12" % Test
-		)
+		"org.scalatest" %% "scalatest" % conf("scala.test") % Test,
+		"org.easymock" % "easymock" % "4.0.2" % Test,
 	)
-
-lazy val antlr =
-	project
-		.settings(
-			name := "antlr",
-			commonSettings,
-
-			// ... hmm ... seems to do a chicken-or-egg recurisve problem
-			libraryDependencies ++= Seq(
-				"org.antlr" % "antlr4-runtime" % "4.7",
-				"org.antlr" % "antlr4" % "4.7"
-			)
-		)
-		.dependsOn(
-			basecode
-		)
-
-lazy val basecode =
-	project
-		.settings(
-			name := "peterlavalle",
-			commonSettings,
-
-			libraryDependencies ++= Seq(
-				"org.codehaus.plexus" % "plexus-utils" % "3.1.0"
-			)
-		)
-
-lazy val frege =
-	project
-		.settings(
-			name := "peterlavalle",
-			commonSettings
-		)
-
-lazy val junit =
-	project
-		.settings(
-			name := "junit",
-			commonSettings,
-			libraryDependencies ++= Seq(
-				"junit" % "junit" % "4.12",
-				"org.easymock" % "easymock" % "3.5.1"
-			)
-		)
-		.dependsOn(
-			basecode
-		)
-
-lazy val merc =
-	project
-		.settings(
-			name := "merc",
-			commonSettings
-		)
-		.dependsOn(basecode)
-
-lazy val pcof =
-	project
-		.settings(
-			name := "pcof",
-			commonSettings
-		)
-		.dependsOn(basecode)
-		.dependsOn(junit % Test)
-
-lazy val phile =
-	project
-		.settings(
-			name := "phile",
-			commonSettings
-		)
-		.dependsOn(basecode)
-		.dependsOn(junit % Test)
-
-lazy val swung =
-	project
-		.settings(
-			name := "peterlavalle-swung",
-			commonSettings
-		)
-		.dependsOn(
-			basecode
-		)
-
-lazy val sstate =
-	(project in file("sstate"))
-		.settings(
-			name := "sstate",
-			commonSettings
-		)
-
-lazy val root =
-	(project in file("."))
-		.aggregate(
-			antlr,
-			basecode,
-			frege,
-			junit,
-			merc,
-			pcof,
-			phile,
-			sstate,
-			swung
-		)
-		.settings(
-			name := "peterlavalle-root",
-			commonSettings
-		)
-
-
-
-/*
-	git clone git@github.com:g-pechorin/m2-repo.git
-	git fetch
-	git checkout gh-pages
-	git pull
-	git add .
-	git commit -m "???"
-*/
